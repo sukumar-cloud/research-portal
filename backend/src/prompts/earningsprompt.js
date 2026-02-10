@@ -10,7 +10,7 @@ function earningsCallPrompt(transcriptText) {
   ====================
   STRICT RULES (MANDATORY):
   ====================
-  - Use ONLY facts directly mentioned in the transcript.
+  - Use ONLY facts directly mentioned in the transcript. Only extract information that is explicitly stated in the transcript.
   - DO NOT use generic earnings call language.
   - DO NOT infer, assume, generalize, or add industry-standard statements.
   - DO NOT mention digital transformation, partnerships, competition, macro uncertainty, or efficiency
