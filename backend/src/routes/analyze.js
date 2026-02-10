@@ -4,7 +4,6 @@ const { extractText } = require("../services/pdfService");
 const { analyzeEarningsCall } = require("../services/llmService");
 
 const router = express.Router();
-
 const upload = multer({
   dest: "uploads/",
   limits: { fileSize: 10 * 1024 * 1024 }
@@ -17,6 +16,8 @@ router.post("/", upload.single("file"), async (req, res) => {
     }
 
     const text = await extractText(req.file.path);
+    console.log("TRANSCRIPT PREVIEW:", text.slice(0, 500));
+
     const analysis = await analyzeEarningsCall(text);
 
     let parsed;

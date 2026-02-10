@@ -17,8 +17,7 @@ async function analyzeEarningsCall(transcriptText) {
           content: earningsCallPrompt(transcriptText)
         }
       ],
-      temperature: 0,
-      response_format: { type: "json_object" }
+      temperature: 0
     })
   });
 
