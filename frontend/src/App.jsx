@@ -127,7 +127,8 @@ export default function App() {
 
     setLoading(true);
     try {
-      const resp = await fetch("/api/analyze", {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "";
+      const resp = await fetch(`${apiBase}/api/analyze`, {
         method: "POST",
         body: form
       });

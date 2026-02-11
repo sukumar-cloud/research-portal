@@ -82,11 +82,16 @@ Frontend runs on `http://localhost:5173` (proxies `/api/*` to backend).
 ## Limitations
 
 - OCR can be slow on large PDFs; consider limiting pages or using pre‑extracted text.
-- Free hosting may time out on very long transcripts; chunking mitigates this.
-- Requires `GROQ_API_KEY`; no fallback to other providers.
 
 ---
 
+## OCR & Deployment notes
+
+- **Local development**: OCR via `pdf-poppler` + `tesseract.js` works very well on Windows/macOS.
+- **Render deployment**: Linux serverless environments don’t support the native binaries `tesseract.js` needs, so OCR was removed. We now use `pdf-parse` for selectable text only.
+- **Production recommendation**: Use a paid cloud OCR service (e.g., Google Cloud Vision OCR) for reliable, server‑compatible text extraction from scanned PDFs. This would improve accuracy and avoid platform‑specific dependencies.
+
+---
 
 ### License
 
