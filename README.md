@@ -1,98 +1,131 @@
 # Research Portal – Earnings Call Summary Tool
 
-> **Option B** – Structured analyst summaries from earnings call transcripts.
+> **Option B – Structured Analyst Summaries from Earnings Call Transcripts**
 
-## What this does
--- works only for thentext format now bcz of ocr issue.
-A researcher uploads a PDF earnings call transcript. The system extracts text (OCR if needed) and produces a structured summary:
+---
 
-- Management tone (Optimistic / Neutral / Cautious / Pessimistic)
-- Confidence level (High / Medium / Low)
-- 3–5 key positives
-- 3–5 key concerns
-- Forward guidance (revenue, margin, capex)
-- Capacity utilization trends
-- 2–3 growth initiatives
+## ⚠️ Important (Free Tier Notice)
 
-The output is a clean, analyst‑ready JSON object displayed in the UI.
+This project is deployed using free-tier hosting (Render + Vercel).
+
+Because of:
+- Cold starts
+- Free compute limits
+- LLM rate limits
+
+⏳ **Please wait up to 60 seconds after clicking “Analyze”.**
+
+The system may take some time to:
+1. Extract transcript text
+2. Chunk the document
+3. Call the LLM
+4. Merge structured results
+
+This is expected behavior on free infrastructure.
+
+---
+
+## Live Demo Screenshot
+
+![Research Portal Screenshot](./docs/screenshot.png)
+
+> The tool produces structured, analyst-ready summaries.
+
+---
+
+## What This Tool Does
+
+A researcher uploads a PDF earnings call transcript.
+
+The system extracts the text and produces a structured summary containing:
+
+- Management Tone (Optimistic / Neutral / Cautious / Pessimistic)
+- Confidence Level (High / Medium / Low)
+- 3–5 Key Positives
+- 3–5 Key Concerns
+- Forward Guidance (Revenue / Margin / Capex)
+- Capacity Utilization Trends
+- 2–3 Growth Initiatives
+
+The output is structured, clean, and analyst-usable.
+
+---
+
+## Current Limitation
+
+⚠️ **Currently supports text-based PDFs only.**
+
+Due to OCR deployment limitations on Render (Linux environment):
+
+- Scanned/image PDFs are NOT supported in production.
+- Local development supports OCR.
+- Production uses `pdf-parse` for selectable text extraction.
+
+For best results:
+- Use text-based transcripts (NSE/BSE filings, Investor Relations sites).
 
 ---
 
 ## Architecture
 
-- **Frontend**: React (Vite) – white‑theme UI with file upload and formatted results.
-- **Backend**: Node.js/Express – multipart upload, OCR fallback, LLM analysis.
-- **LLM**: Groq (Llama‑3.1‑8b‑instant) with a strict prompt that returns only JSON.
-- **OCR**: `pdf-poppler` + `tesseract.js` (fallback when text extraction is insufficient).
-
----
-
-## Setup (local)
+### Frontend
+- React (Vite)
+- Clean structured UI
+- File upload + formatted summary display
+- Deployed on Vercel
 
 ### Backend
-```bash
-cd backend
-npm install
-# Create .env with GROQ_API_KEY
-node src/app.js
-```
-Server runs on `http://localhost:5000`.
+- Node.js + Express
+- Multer for file upload
+- pdf-parse for text extraction
+- Groq LLM (Llama-3.1-8b-instant)
+- Strict JSON prompt enforcement
+- Deployed on Render
 
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Frontend runs on `http://localhost:5173` (proxies `/api/*` to backend).
+### LLM
+- Groq API
+- Strict prompt
+- No hallucination policy
+- Chunked processing to avoid token limits
 
 ---
 
-## Deployment notes
+## How It Works
 
-- **Backend**: Deploy on Render, Railway, or similar. Set `GROQ_API_KEY` in environment.
-- **Frontend**: Deploy on Vercel/Netlify. Ensure the API proxy points to the deployed backend URL.
-- **File size limit**: 10 MB (configurable in `routes/analyze.js`).
-- **OCR on serverless**: OCR can be slow on cold starts; most PDFs will use `pdf-poppler` text extraction first.
-- **Rate limits**: Groq rate‑limits are handled with retries and 4‑second delays between chunks.
-
----
-
-## How it works (Option B)
-
-1. **Upload** → PDF is stored temporarily in `uploads/`.
-2. **Text extraction** → Try `pdf-poppler` first; if insufficient, run OCR via `tesseract.js`.
-3. **Chunking** → Transcript is split into 2000‑character chunks to stay within model limits.
-4. **LLM analysis per chunk** → Each chunk is sent to Groq with a strict JSON prompt.
-5. **Merge results** → Consolidate tone, confidence, positives/concerns, guidance, capacity, and initiatives.
-6. **Cleanup** → Temporary files are deleted.
-7. **Display** → Frontend renders a clean, sectioned summary.
+1. User uploads transcript PDF
+2. Backend extracts selectable text
+3. Transcript is chunked (to avoid token limits)
+4. Each chunk is analyzed by LLM
+5. Structured JSON responses are merged
+6. Final summary is displayed in UI
 
 ---
 
-## Key design choices
+## Key Design Decisions
 
-- **No hallucination**: Prompt forces “Not mentioned” for missing data; we never infer.
-- **Structured output**: Always the same JSON schema; frontend renders it as headings/bullets.
-- **Graceful OCR**: If native PDF text is too short, we fall back to OCR without external tools.
-- **Rate‑limit safety**: Built‑in retries and delays.
-
----
-
-## Limitations
-
-- OCR can be slow on large PDFs; consider limiting pages or using pre‑extracted text.
+- No hallucination: If not mentioned → “Not mentioned”
+- Strict JSON-only model responses
+- Chunk-based analysis to avoid token overflow
+- Retry + delay logic to handle rate limits
+- Clean structured UI (not chatbot style)
 
 ---
 
-## OCR & Deployment notes
+## Deployment Setup
 
-- **Local development**: OCR via `pdf-poppler` + `tesseract.js` works very well on Windows/macOS.
-- **Render deployment**: Linux serverless environments don’t support the native binaries `tesseract.js` needs, so OCR was removed. We now use `pdf-parse` for selectable text only.
-- **Production recommendation**: Use a paid cloud OCR service (e.g., Google Cloud Vision OCR) for reliable, server‑compatible text extraction from scanned PDFs. This would improve accuracy and avoid platform‑specific dependencies.
+### Backend (Render)
+- Root directory: `backend`
+- Start command: `node src/app.js`
+- Environment variable:
+  - `GROQ_API_KEY`
+
+### Frontend (Vercel)
+- Root directory: `frontend`
+- Environment variable:
+  - `VITE_API_BASE_URL=https://your-render-backend-url.onrender.com`
 
 ---
 
-### License
+## File Size Limit
 
-MIT.
+Currently set to:
