@@ -3,7 +3,7 @@
 > **Option B** – Structured analyst summaries from earnings call transcripts.
 
 ## What this does
-
+-- works only for thentext format now bcz of ocr issue.
 A researcher uploads a PDF earnings call transcript. The system extracts text (OCR if needed) and produces a structured summary:
 
 - Management tone (Optimistic / Neutral / Cautious / Pessimistic)
