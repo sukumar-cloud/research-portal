@@ -4,42 +4,50 @@ const { chunkText } = require("../utils/chunk");
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-async function analyzeChunk(chunk) {
-  const response = await axios.post(
-    "https://api.groq.com/openai/v1/chat/completions",
-    {
-      model: "llama-3.1-8b-instant",
-      messages: [
-        { role: "user", content: earningsCallPrompt(chunk) }
-      ],
-      temperature: 0
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${GROQ_API_KEY}`
-      }
-    }
-  );
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-  return response.data.choices[0].message.content;
+async function analyzeChunk(chunk, retries = 3) {
+  try {
+    const response = await axios.post(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        model: "llama-3.1-8b-instant",
+        messages: [{ role: "user", content: earningsCallPrompt(chunk) }],
+        temperature: 0
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${GROQ_API_KEY}`
+        }
+      }
+    );
+
+    return JSON.parse(response.data.choices[0].message.content);
+
+  } catch (error) {
+    if (error.response && error.response.status === 429 && retries > 0) {
+      console.log("Rate limit hit. Waiting 8 seconds...");
+      await sleep(8000);
+      return analyzeChunk(chunk, retries - 1);
+    }
+    throw error;
+  }
 }
 
 async function analyzeEarningsCall(fullTranscript) {
-  const chunks = chunkText(fullTranscript, 3500);
-
-  let combinedResults = [];
+  const chunks = chunkText(fullTranscript, 2000);
+  let results = [];
 
   for (const chunk of chunks) {
-    const result = await analyzeChunk(chunk);
-    try {
-      combinedResults.push(JSON.parse(result));
-    } catch (err) {
-      console.error("Chunk JSON parse error:", result);
-    }
+    const data = await analyzeChunk(chunk);
+    results.push(data);
+    await sleep(4000);
   }
 
-  return mergeResults(combinedResults);
+  return mergeResults(results);
 }
 
 function mergeResults(results) {
@@ -81,12 +89,12 @@ function mergeResults(results) {
       final.capacity_utilization = r.capacity_utilization;
   });
 
-  // Remove duplicates
-  final.key_positives = [...new Set(final.key_positives)];
-  final.key_concerns = [...new Set(final.key_concerns)];
-  final.growth_initiatives = [...new Set(final.growth_initiatives)];
+  // Clean & limit counts
+  final.key_positives = [...new Set(final.key_positives)].slice(0, 5);
+  final.key_concerns = [...new Set(final.key_concerns)].slice(0, 5);
+  final.growth_initiatives = [...new Set(final.growth_initiatives)].slice(0, 3);
 
-  return JSON.stringify(final);
+  return final;
 }
 
 module.exports = { analyzeEarningsCall };
