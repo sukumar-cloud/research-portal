@@ -27,9 +27,11 @@ This is expected behavior on free infrastructure.
 
 ## Live Demo Screenshot
 
-![Research Portal Screenshot](./docs/screenshot.png)
+> ⚠️ Free-tier deployment may take up to **60 seconds** to return results after clicking "Analyze".
+> Please wait — the backend may be warming up.
 
-> The tool produces structured, analyst-ready summaries.
+![Research Portal Screenshot](docs/screenshot.png)
+
 
 ---
 
