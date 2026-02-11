@@ -4,6 +4,7 @@ const { extractText } = require("../services/pdfService");
 const { analyzeEarningsCall } = require("../services/llmService");
 
 const router = express.Router();
+
 const upload = multer({
   dest: "uploads/",
   limits: { fileSize: 10 * 1024 * 1024 }
@@ -16,26 +17,26 @@ router.post("/", upload.single("file"), async (req, res) => {
     }
 
     const text = await extractText(req.file.path);
-    console.log("TRANSCRIPT PREVIEW:", text.slice(0, 500));
+    console.log("TRANSCRIPT PREVIEW:", String(text).slice(0, 500));
 
-    const analysis = await analyzeEarningsCall(text);
+const limitedText = text.slice(0, 12000);
+const analysis = await analyzeEarningsCall(limitedText);
 
     let parsed;
     try {
       parsed = JSON.parse(analysis);
     } catch (parseError) {
       console.error("JSON PARSE ERROR:", parseError, "RAW OUTPUT:", analysis);
-      return res
-        .status(500)
-        .json({ error: "Model did not return valid JSON" });
+      return res.status(500).json({ error: "Model did not return valid JSON" });
     }
 
     return res.json(parsed);
   } catch (error) {
     console.error("ANALYZE ERROR:", error);
-    return res
-      .status(500)
-      .json({ error: "Analysis failed", details: error.message || String(error) });
+    return res.status(500).json({
+      error: "Analysis failed",
+      details: error.message || String(error)
+    });
   }
 });
 

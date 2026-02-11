@@ -39,7 +39,13 @@ function earningsCallPrompt(transcriptText) {
     "capacity_utilization": "string or Not mentioned",
     "growth_initiatives": []
   }
-  
+  ADDITIONAL INSTRUCTIONS:
+- Capture at least 3 key positives if available.
+- Capture at least 2 key concerns if mentioned.
+- If margins or production numbers are explicitly stated, include the numeric range exactly as mentioned.
+- Do not invent numbers.
+- If production volumes are stated (e.g., wagons per month), include them in capacity_utilization.
+
   ====================
   IMPORTANT CLARIFICATIONS:
   ====================
