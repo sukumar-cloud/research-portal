@@ -1,68 +1,38 @@
-function earningsCallPrompt(transcriptText) {
-    return `
-  You are a professional equity research analyst.
-  
-  You are analyzing an earnings call transcript provided below.
-  
-  Your task is to extract ONLY information that is EXPLICITLY stated in the transcript.
-  This is NOT a creative task.
-  
-  ====================
-  STRICT RULES (MANDATORY):
-  ====================
-  - Use ONLY facts directly mentioned in the transcript. Only extract information that is explicitly stated in the transcript.
-  - DO NOT use generic earnings call language.
-  - DO NOT infer, assume, generalize, or add industry-standard statements.
-  - DO NOT mention digital transformation, partnerships, competition, macro uncertainty, or efficiency
-    UNLESS they are clearly discussed by management.
-  - If information is vague, indirect, or not clearly stated, write "Not mentioned".
-  - If a section is not discussed at all, write "Not mentioned".
-  - Prefer transcript-specific wording (rail wagons, metro coaches, shipbuilding, order book, capacity ramp-up, etc.).
-  - If unsure, choose "Not mentioned".
-  - Return ONLY valid JSON.
-  - Do NOT include explanations, commentary, markdown, or extra text.
-  
-  ====================
-  REQUIRED JSON FORMAT:
-  ====================
-  
-  {
-    "management_tone": "Optimistic | Neutral | Cautious | Pessimistic | Not mentioned",
-    "confidence_level": "High | Medium | Low | Not mentioned",
-    "key_positives": [],
-    "key_concerns": [],
-    "forward_guidance": {
-      "revenue": "string or Not mentioned",
-      "margin": "string or Not mentioned",
-      "capex": "string or Not mentioned"
-    },
-    "capacity_utilization": "string or Not mentioned",
-    "growth_initiatives": []
-  }
-  ADDITIONAL INSTRUCTIONS:
-- Capture at least 3 key positives if available.
-- Capture at least 2 key concerns if mentioned.
-- If margins or production numbers are explicitly stated, include the numeric range exactly as mentioned.
-- Do not invent numbers.
-- If production volumes are stated (e.g., wagons per month), include them in capacity_utilization.
+function earningsCallPrompt(transcriptChunk) {
+  return `
+You are a senior institutional equity research analyst.
 
-  ====================
-  IMPORTANT CLARIFICATIONS:
-  ====================
-  - If guidance is given in volumes, execution, order book, or ramp-up terms (not numbers),
-    summarize it factually.
-  - Do NOT fabricate margins, capex plans, or utilization percentages.
-  - Do NOT use phrases like "strong growth", "robust demand", or "strategic focus"
-    unless management clearly said so.
-  
-  ====================
-  TRANSCRIPT:
-  ====================
-  """
-  ${transcriptText}
-  """
-  `;
-  }
-  
-  module.exports = { earningsCallPrompt };
-  
+Analyze ONLY the information explicitly mentioned in the transcript below.
+
+STRICT RULES:
+- Do NOT assume.
+- Do NOT generalize.
+- Do NOT repeat vague statements.
+- If something is not clearly mentioned, write "Not mentioned".
+- Extract only concrete facts.
+- Avoid duplication.
+- Return STRICTLY valid JSON.
+- No explanations outside JSON.
+
+Required JSON format:
+
+{
+  "management_tone": "",
+  "confidence_level": "",
+  "key_positives": [],
+  "key_concerns": [],
+  "forward_guidance": {
+    "revenue": "",
+    "margin": "",
+    "capex": ""
+  },
+  "capacity_utilization": "",
+  "growth_initiatives": []
+}
+
+Transcript:
+${transcriptChunk}
+`;
+}
+
+module.exports = { earningsCallPrompt };
