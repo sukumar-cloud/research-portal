@@ -1,133 +1,125 @@
 # Research Portal – Earnings Call Summary Tool
 
-> **Option B – Structured Analyst Summaries from Earnings Call Transcripts**
+An AI-powered platform that analyzes earnings call transcripts and generates structured analyst summaries using LLMs.
 
 ---
 
-## ⚠️ Important (Free Tier Notice)
+## 🚀 Overview
 
-This project is deployed using free-tier hosting (Render + Vercel).
+This system enables users to upload earnings call transcripts and automatically extract key insights in a structured format.
 
-Because of:
-- Cold starts
-- Free compute limits
-- LLM rate limits
+### Key Outputs
 
-⏳ **Please wait up to 60 seconds after clicking “Analyze”.**
+* Management Tone (Optimistic / Neutral / Cautious / Pessimistic)
+* Confidence Level (High / Medium / Low)
+* Key Positives (3–5 points)
+* Key Concerns (3–5 points)
+* Forward Guidance (Revenue, Margin, Capex)
+* Capacity Utilization Trends
+* Growth Initiatives
 
-The system may take some time to:
-1. Extract transcript text
-2. Chunk the document
-3. Call the LLM
-4. Merge structured results
-
-This is expected behavior on free infrastructure.
+The output is clean, structured, and suitable for research and analysis workflows.
 
 ---
 
-## Live Demo Screenshot
-
-> ⚠️ Free-tier deployment may take up to **60 seconds** to return results after clicking "Analyze".
-> Please wait — the backend may be warming up.
-
-![Research Portal Screenshot](docs/screenshot.png)
-
-
----
-
-## What This Tool Does
-
-A researcher uploads a PDF earnings call transcript.
-
-The system extracts the text and produces a structured summary containing:
-
-- Management Tone (Optimistic / Neutral / Cautious / Pessimistic)
-- Confidence Level (High / Medium / Low)
-- 3–5 Key Positives
-- 3–5 Key Concerns
-- Forward Guidance (Revenue / Margin / Capex)
-- Capacity Utilization Trends
-- 2–3 Growth Initiatives
-
-The output is structured, clean, and analyst-usable.
-
----
-
-## Current Limitation
-
-⚠️ **Currently supports text-based PDFs only.**
-
-Due to OCR deployment limitations on Render (Linux environment):
-
-- Scanned/image PDFs are NOT supported in production.
-- Local development supports OCR.
-- Production uses `pdf-parse` for selectable text extraction.
-
-For best results:
-- Use text-based transcripts (NSE/BSE filings, Investor Relations sites).
-
----
-
-## Architecture
+## 🛠 Tech Stack
 
 ### Frontend
-- React (Vite)
-- Clean structured UI
-- File upload + formatted summary display
-- Deployed on Vercel
+
+* React (Vite)
 
 ### Backend
-- Node.js + Express
-- Multer for file upload
-- pdf-parse for text extraction
-- Groq LLM (Llama-3.1-8b-instant)
-- Strict JSON prompt enforcement
-- Deployed on Render
+
+* Node.js
+* Express.js
+* Multer (file upload)
+* pdf-parse (text extraction)
 
 ### LLM
-- Groq API
-- Strict prompt
-- No hallucination policy
-- Chunked processing to avoid token limits
+
+* Groq API (Llama 3.1)
+* Structured prompt engineering
+* Chunk-based processing
+
+### Deployment
+
+* Vercel (Frontend)
+* Render (Backend)
 
 ---
 
-## How It Works
+## ⚙️ How It Works
 
-1. User uploads transcript PDF
+1. User uploads a transcript PDF
 2. Backend extracts selectable text
-3. Transcript is chunked (to avoid token limits)
-4. Each chunk is analyzed by LLM
-5. Structured JSON responses are merged
-6. Final summary is displayed in UI
+3. Transcript is split into chunks to handle token limits
+4. Each chunk is processed by the LLM
+5. Structured JSON outputs are generated
+6. Results are merged into a final summary
 
 ---
 
-## Key Design Decisions
+## 🔄 Core Features
 
-- No hallucination: If not mentioned → “Not mentioned”
-- Strict JSON-only model responses
-- Chunk-based analysis to avoid token overflow
-- Retry + delay logic to handle rate limits
-- Clean structured UI (not chatbot style)
+### 📄 Document Processing
+
+* Supports large transcript files
+* Efficient chunking to avoid token overflow
+
+### 🧠 LLM Integration
+
+* Strict JSON-based prompt enforcement
+* Deterministic outputs with minimal hallucination
+
+### ⚡ Reliability Handling
+
+* Retry and delay mechanisms for API rate limits
+* Graceful handling of incomplete data
+
+### 🎯 Structured Output
+
+* Clean, analyst-friendly format
+* No chatbot-style responses
 
 ---
 
-## Deployment Setup
+## ⚠️ Limitations
+
+* Supports only text-based PDFs
+* Scanned/image PDFs are not supported in production
+* Performance may vary due to free-tier hosting constraints
+
+---
+
+## 📡 Deployment
 
 ### Backend (Render)
-- Root directory: `backend`
-- Start command: `node src/app.js`
-- Environment variable:
-  - `GROQ_API_KEY`
+
+* Root directory: `backend`
+* Start command: `node src/app.js`
+* Environment variable:
+
+  * `GROQ_API_KEY`
 
 ### Frontend (Vercel)
-- Root directory: `frontend`
-- Environment variable:
-  - `VITE_API_BASE_URL=https://your-render-backend-url.onrender.com`
+
+* Root directory: `frontend`
+* Environment variable:
+
+  * `VITE_API_BASE_URL=https://your-backend-url.onrender.com`
 
 ---
 
-## File Size Limit
+## 🎯 Key Highlights
 
-Currently set to:
+* LLM-powered document analysis pipeline
+* Chunk-based processing for scalability
+* Structured JSON output for reliability
+* End-to-end full-stack implementation
+* Production deployment with real-world constraints
+
+---
+
+## 👨‍💻 Author
+
+Built as a full-stack AI project focusing on document processing, prompt engineering, and scalable LLM integration.
